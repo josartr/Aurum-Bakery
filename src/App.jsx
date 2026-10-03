@@ -356,16 +356,88 @@ function CatalogPage() {
   )
 }
 
+const eventOfferings = [
+  { id: 'mesa-dulce', name: 'Mesa dulce', detail: 'Selección de mini postres y montaje', pricePerGuest: 8500 },
+  { id: 'torta', name: 'Torta de celebración', detail: 'Torta personalizada y decoración', pricePerGuest: 5500 },
+  { id: 'brunch', name: 'Brunch corporativo', detail: 'Panadería, dulces y bebidas', pricePerGuest: 12500 },
+  { id: 'corporativo', name: 'Regalos corporativos', detail: 'Cajas personalizadas para invitados', pricePerGuest: 10500 },
+]
+
+const eventServices = [
+  { id: 'retiro', name: 'Retiro en tienda', price: 0 },
+  { id: 'despacho', name: 'Despacho programado', price: 15000 },
+  { id: 'montaje', name: 'Despacho y montaje', price: 45000 },
+]
+
+const formatCurrency = (value) =>
+  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(value)
+
 function EventsPage({ onNavigate }) {
+  const [guests, setGuests] = useState(30)
+  const [offeringId, setOfferingId] = useState(eventOfferings[0].id)
+  const [serviceId, setServiceId] = useState(eventServices[1].id)
+  const [submitted, setSubmitted] = useState(false)
+  const offering = eventOfferings.find((item) => item.id === offeringId)
+  const service = eventServices.find((item) => item.id === serviceId)
+  const estimate = (Number(guests) || 0) * offering.pricePerGuest + service.price
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    setSubmitted(true)
+  }
+
   return (
     <main className="page">
-      <section className="container centered-page">
+      <section className="container page-heading">
         <p className="eyebrow">Celebraciones</p>
         <h1>Haz de tu evento algo <em>memorable</em></h1>
         <p className="lead">Diseñamos experiencias dulces para matrimonios, celebraciones, empresas y eventos especiales.</p>
-        <button className="button button-primary" onClick={() => onNavigate('contacto')}>
-          Solicitar una cotización
-        </button>
+      </section>
+      <section className="container event-planner">
+        <div className="event-planner-copy">
+          <p className="eyebrow">Planifica tu experiencia</p>
+          <h2>Calcula un presupuesto <em>aproximado</em></h2>
+          <p>Selecciona el formato que necesitas, cuéntanos cuántos invitados tendrás y ajusta el servicio. El valor final se confirma según diseño, sabores y logística.</p>
+          <div className="event-benefits">
+            <span>✓ Ingredientes seleccionados</span>
+            <span>✓ Propuesta personalizada</span>
+            <span>✓ Atención de principio a fin</span>
+          </div>
+        </div>
+        <form className="estimate-card" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label htmlFor="event-offering">Producto o servicio</label>
+            <select id="event-offering" value={offeringId} onChange={(event) => setOfferingId(event.target.value)}>
+              {eventOfferings.map((item) => <option key={item.id} value={item.id}>{item.name} - {item.detail}</option>)}
+            </select>
+          </div>
+          <div className="form-field">
+            <label htmlFor="event-guests">Número de invitados</label>
+            <input id="event-guests" type="number" min="1" max="1000" value={guests} onChange={(event) => setGuests(event.target.value)} />
+          </div>
+          <div className="form-field">
+            <label htmlFor="event-service">Logística</label>
+            <select id="event-service" value={serviceId} onChange={(event) => setServiceId(event.target.value)}>
+              {eventServices.map((item) => <option key={item.id} value={item.id}>{item.name}{item.price ? ` (+${formatCurrency(item.price)})` : ''}</option>)}
+            </select>
+          </div>
+          <div className="estimate-result" aria-live="polite">
+            <span>Presupuesto estimado</span>
+            <strong>{formatCurrency(estimate)}</strong>
+            <small>{formatCurrency(offering.pricePerGuest)} por invitado + {formatCurrency(service.price)} de logística</small>
+          </div>
+          <button className="button button-primary" type="submit">Solicitar cotización formal</button>
+          {submitted && <p className="form-success" role="status">Perfecto. Escríbenos en Contacto con estos datos y prepararemos una propuesta a tu medida.</p>}
+        </form>
+      </section>
+      <section className="container event-process">
+        <div><span>01</span><h3>Conversamos</h3><p>Entendemos tu fecha, estilo y número de invitados.</p></div>
+        <div><span>02</span><h3>Diseñamos</h3><p>Preparamos una propuesta con sabores, cantidades y montaje.</p></div>
+        <div><span>03</span><h3>Celebramos</h3><p>Coordinamos cada detalle para que solo te preocupes de disfrutar.</p></div>
+      </section>
+      <section className="container event-cta">
+        <p>¿Ya tienes una idea en mente?</p>
+        <button className="button button-secondary" onClick={() => onNavigate('contacto')}>Hablar con un especialista</button>
       </section>
     </main>
   )
@@ -381,20 +453,59 @@ function ContactPage() {
 
   return (
     <main className="page">
-      <section className="container centered-page">
-        <p className="eyebrow">Hablemos</p>
-        <h1>Ponte en <em>contacto</em> con nosotros</h1>
-        <p className="lead">¿Tienes dudas, pedidos especiales o quieres cotizar un evento? Escríbenos y te responderemos a la brevedad.</p>
+      <section className="container page-heading">
+        <p className="eyebrow">Atención personalizada</p>
+        <h1>Hablemos de tu próxima <em>celebración</em></h1>
+        <p className="lead">Estamos aquí para ayudarte a elegir, personalizar y coordinar cada detalle. Respondemos en menos de 24 horas hábiles.</p>
+      </section>
+      <section className="container contact-layout">
+        <aside className="contact-aside">
+          <div className="contact-intro">
+            <p className="eyebrow">Estamos para ayudarte</p>
+            <h2>Un buen día comienza con una buena conversación.</h2>
+            <p>Cuéntanos qué tienes en mente y nuestro equipo te orientará con opciones, disponibilidad y próximos pasos.</p>
+          </div>
+          <div className="contact-details">
+            <a href="https://wa.me/56912345678" target="_blank" rel="noreferrer"><span>WhatsApp</span><strong>+56 9 1234 5678</strong></a>
+            <a href="mailto:hola@aurumbakery.cl"><span>Correo electrónico</span><strong>hola@aurumbakery.cl</strong></a>
+            <div><span>Horario de atención</span><strong>Lun - Sáb · 09:00 a 19:00</strong></div>
+            <div><span>Visítanos</span><strong>Av. Providencia 1234, Santiago</strong></div>
+          </div>
+        </aside>
         <form className="contact-form" onSubmit={handleSubmit}>
-          <label htmlFor="name">Nombre</label>
-          <input id="name" name="name" type="text" placeholder="Tu nombre" required />
-          <label htmlFor="email">Correo electrónico</label>
-          <input id="email" name="email" type="email" placeholder="tucorreo@ejemplo.com" required />
-          <label htmlFor="message">Mensaje</label>
-          <textarea id="message" name="message" rows="5" placeholder="Cuéntanos qué necesitas" required />
-          <button className="button button-primary" type="submit">Enviar mensaje</button>
-          {submitted && <p className="form-success" role="status">Gracias por escribirnos. Te contactaremos pronto.</p>}
+          <div className="form-field">
+            <label htmlFor="name">Nombre completo</label>
+            <input id="name" name="name" type="text" placeholder="Tu nombre" required />
+          </div>
+          <div className="form-field">
+            <label htmlFor="email">Correo electrónico</label>
+            <input id="email" name="email" type="email" placeholder="tucorreo@ejemplo.com" required />
+          </div>
+          <div className="form-field">
+            <label htmlFor="reason">¿En qué podemos ayudarte?</label>
+            <select id="reason" name="reason" defaultValue="evento">
+              <option value="evento">Cotizar un evento</option>
+              <option value="pedido">Hacer un pedido</option>
+              <option value="personalizada">Torta personalizada</option>
+              <option value="corporativo">Regalos corporativos</option>
+              <option value="otro">Otra consulta</option>
+            </select>
+          </div>
+          <div className="form-field">
+            <label htmlFor="message">Cuéntanos más</label>
+            <textarea id="message" name="message" rows="5" placeholder="Fecha, cantidad de personas, sabores o cualquier detalle importante" required />
+          </div>
+          <button className="button button-primary" type="submit">Enviar consulta</button>
+          {submitted && <p className="form-success" role="status">Gracias por escribirnos. Recibimos tu consulta y te responderemos dentro de 24 horas hábiles.</p>}
         </form>
+      </section>
+      <section className="container contact-faq">
+        <p className="eyebrow">Preguntas frecuentes</p>
+        <div className="faq-grid">
+          <div><h3>¿Con cuánta anticipación debo reservar?</h3><p>Recomendamos 72 horas para pedidos simples y 7 a 10 días para eventos o tortas personalizadas.</p></div>
+          <div><h3>¿Realizan despacho?</h3><p>Sí, coordinamos despachos programados y servicio de montaje según comuna y disponibilidad.</p></div>
+          <div><h3>¿Puedo solicitar una degustación?</h3><p>Para eventos sobre 40 invitados podemos coordinar una degustación previa con nuestro equipo.</p></div>
+        </div>
       </section>
     </main>
   )
