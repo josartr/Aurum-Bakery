@@ -229,7 +229,7 @@ h1 em,
 .product-grid {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .product-card {
@@ -245,15 +245,44 @@ h1 em,
   transform: translateY(-5px);
 }
 
+.product-image-wrap {
+  position: relative;
+}
+
 .product-card img {
   display: block;
-  height: 210px;
+  height: 240px;
   object-fit: cover;
   width: 100%;
 }
 
+.product-badge {
+  background: var(--gold);
+  border-radius: 999px;
+  color: var(--background);
+  font-size: 0.7rem;
+  font-weight: 700;
+  left: 1rem;
+  letter-spacing: 0.03em;
+  padding: 0.4rem 0.7rem;
+  position: absolute;
+  text-transform: uppercase;
+  top: 1rem;
+}
+
 .product-card-body {
   padding: 1.4rem;
+}
+
+.product-card-meta {
+  color: #788987;
+  display: flex;
+  font-size: 0.72rem;
+  font-weight: 700;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
 }
 
 .product-card h2 {
@@ -264,7 +293,21 @@ h1 em,
 .product-card p {
   color: #586c6c;
   line-height: 1.55;
-  min-height: 3.1em;
+  min-height: 4.65em;
+}
+
+.product-card-footer {
+  align-items: center;
+  border-top: 1px solid rgba(15, 76, 92, 0.12);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+}
+
+.product-card-footer strong {
+  color: var(--petroleum);
+  font-size: 1.05rem;
 }
 
 .text-button {
@@ -282,6 +325,111 @@ h1 em,
 
 .text-button:hover span {
   transform: translateX(4px);
+}
+
+.catalog-toolbar {
+  align-items: center;
+  border-bottom: 1px solid rgba(251, 250, 248, 0.14);
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.filter-button {
+  background: transparent;
+  border: 1px solid rgba(251, 250, 248, 0.25);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  padding: 0.6rem 1rem;
+  transition: 180ms ease;
+}
+
+.filter-button:hover,
+.filter-button.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--background);
+}
+
+.search-field {
+  align-items: center;
+  background: rgba(251, 250, 248, 0.08);
+  border: 1px solid rgba(251, 250, 248, 0.2);
+  border-radius: 999px;
+  color: var(--gold);
+  display: flex;
+  gap: 0.5rem;
+  max-width: 250px;
+  padding: 0.55rem 0.9rem;
+  width: 100%;
+}
+
+.search-field input {
+  background: transparent;
+  border: 0;
+  color: var(--cream);
+  min-width: 0;
+  outline: 0;
+  width: 100%;
+}
+
+.search-field input::placeholder {
+  color: var(--muted);
+}
+
+.catalog-summary {
+  color: var(--muted);
+  display: flex;
+  font-size: 0.82rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.catalog-summary p {
+  margin: 0;
+}
+
+.catalog-summary strong {
+  color: var(--cream);
+}
+
+.empty-catalog {
+  background: rgba(251, 250, 248, 0.06);
+  border: 1px solid rgba(251, 250, 248, 0.12);
+  border-radius: 12px;
+  margin-top: 2rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.empty-catalog h2 {
+  color: var(--cream);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-catalog > p:not(.eyebrow) {
+  color: var(--muted);
+}
+
+.button-secondary {
+  background: var(--gold);
+  color: var(--background);
+  margin-top: 1rem;
+}
+
+.button-secondary:hover {
+  background: var(--cream);
+  transform: translateY(-2px);
 }
 
 .modal-backdrop {
@@ -307,6 +455,18 @@ h1 em,
 
 .product-modal h2 {
   font-size: 2rem;
+}
+
+.modal-price {
+  color: var(--petroleum);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-price span {
+  color: #718483;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .product-modal h3 {
@@ -420,6 +580,15 @@ h1 em,
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .catalog-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search-field {
+    max-width: none;
+  }
 }
 
 @media (max-width: 520px) {
@@ -437,5 +606,17 @@ h1 em,
 
   .hero-carousel {
     height: 70vw;
+  }
+
+  .catalog-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .product-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
   }
 }
