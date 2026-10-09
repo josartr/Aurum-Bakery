@@ -37,7 +37,7 @@
 }
 
 .brand {
-  color: var(--cream);
+  color: var(--surface);
   font-family: 'Playfair Display', serif;
   font-size: 1.55rem;
   font-weight: 700;
