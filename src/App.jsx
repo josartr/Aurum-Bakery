@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import Footer from './components/Footer'
 
 const products = [
   {
@@ -188,17 +189,7 @@ function Header({ page, onNavigate }) {
   )
 }
 
-function Footer() {
-  return (
-    <footer className="site-footer">
-      <div className="container">
-        <h2>Aurum Bakery</h2>
-        <p>Pastelería artesanal de alto nivel</p>
-        <small>© 2026 Aurum Bakery. Todos los derechos reservados.</small>
-      </div>
-    </footer>
-  )
-}
+
 
 function HomePage({ onNavigate }) {
   const [slide, setSlide] = useState(0)
