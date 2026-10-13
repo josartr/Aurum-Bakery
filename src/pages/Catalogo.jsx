@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { products } from '../data/products'
+import { formatCurrency } from '../utils/formatters'
 
 export default function Catalogo() {
   const [selectedProduct, setSelectedProduct] = useState(null)
@@ -67,7 +68,7 @@ export default function Catalogo() {
               <h2>{product.name}</h2>
               <p>{product.description}</p>
               <div className="product-card-footer">
-                <strong>{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(product.price)}</strong>
+                <strong>{formatCurrency(product.price)}</strong>
                 <button className="text-button" onClick={() => setSelectedProduct(product)}>
                   Ver detalle <span aria-hidden="true">→</span>
                 </button>
@@ -100,7 +101,7 @@ export default function Catalogo() {
             </button>
             <p className="eyebrow">Creación artesanal</p>
             <h2 id="product-modal-title">{selectedProduct.name}</h2>
-            <p className="modal-price">{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(selectedProduct.price)} <span>{selectedProduct.unit}</span></p>
+            <p className="modal-price">{formatCurrency(selectedProduct.price)} <span>{selectedProduct.unit}</span></p>
             <p>{selectedProduct.details}</p>
             <h3>Variedades disponibles</h3>
             <ul>

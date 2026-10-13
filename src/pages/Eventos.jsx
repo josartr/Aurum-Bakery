@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { formatCurrency } from '../utils/formatters'
 
 const eventOfferings = [
   { id: 'mesa-dulce', name: 'Mesa dulce', detail: 'Selección de mini postres y montaje', pricePerGuest: 8500 },
@@ -12,9 +13,6 @@ const eventServices = [
   { id: 'despacho', name: 'Despacho programado', price: 15000 },
   { id: 'montaje', name: 'Despacho y montaje', price: 45000 },
 ]
-
-const formatCurrency = (value) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(value)
 
 export default function Eventos({ onNavigate }) {
   const [guests, setGuests] = useState(30)
