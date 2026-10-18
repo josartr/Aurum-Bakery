@@ -33,7 +33,12 @@ describe('Página de Eventos y Calculadora', () => {
     })
     fireEvent.click(submitButton)
 
-    expect(onNavigate).toHaveBeenCalledWith('contacto')
+    expect(onNavigate).toHaveBeenCalledWith('contacto', {
+  offering: 'Mesa dulce',
+  guests: 30,
+  service: 'Despacho programado',
+  estimate: 270000,
+})
   })
   
 })

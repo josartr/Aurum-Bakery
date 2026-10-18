@@ -25,7 +25,12 @@ export default function Eventos({ onNavigate }) {
 
   function handleSubmit(event) {
   event.preventDefault()
-  onNavigate('contacto')
+  onNavigate('contacto', {
+  offering: offering.name,
+  guests: Number(guests),
+  service: service.name,
+  estimate,
+})
   setSubmitted(true)
 }
 

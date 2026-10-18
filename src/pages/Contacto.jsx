@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { formatCurrency } from '../utils/formatters'
 
-export default function Contacto() {
+export default function Contacto({ quote = null })  {
   const [submitted, setSubmitted] = useState(false)
 
   function handleSubmit(event) {
@@ -50,7 +51,12 @@ export default function Contacto() {
           </div>
           <div className="form-field">
             <label htmlFor="message">Cuéntanos más</label>
-            <textarea id="message" name="message" rows="5" placeholder="Fecha, cantidad de personas, sabores o cualquier detalle importante" required />
+            <textarea id="message"name="message"rows="5"placeholder="Fecha, cantidad de personas, sabores o cualquier detalle importante"
+defaultValue={quote
+    ? `Solicito cotización de ${quote.offering} para ${quote.guests} invitados. Logística: ${quote.service}. Presupuesto estimado: ${formatCurrency(quote.estimate)}.`
+    : ''}
+  required
+/>
           </div>
           <button className="button button-primary" type="submit">Enviar consulta</button>
           {submitted && <p className="form-success" role="status">Gracias por escribirnos. Recibimos tu consulta y te responderemos dentro de 24 horas hábiles.</p>}

@@ -11,13 +11,19 @@ import Contacto from './pages/Contacto'
 
 function App() {
   const [page, setPage] = useState(() => window.location.hash.replace('#/', '') || 'inicio')
+  const [quote, setQuote] = useState(null)
 
-  function navigate(nextPage) {
-    const safePage = pages.includes(nextPage) ? nextPage : 'inicio'
-    window.history.pushState({}, '', `#/${safePage}`)
-    setPage(safePage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  function navigate(nextPage, quoteData = null) {
+  const safePage = pages.includes(nextPage) ? nextPage : 'inicio'
+
+  if (safePage === 'contacto') {
+    setQuote(quoteData)
   }
+
+  window.history.pushState({}, '', `#/${safePage}`)
+  setPage(safePage)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
   useEffect(() => {
     const handleBack = () => setPage(window.location.hash.replace('#/', '') || 'inicio')
@@ -33,7 +39,7 @@ function App() {
     inicio: <Inicio onNavigate={navigate} />,
     catalogo: <Catalogo />,
     eventos: <Eventos onNavigate={navigate} />,
-    contacto: <Contacto />,
+    contacto: <Contacto quote={quote} />,
   }[page] || <Inicio onNavigate={navigate} />
 
   return (
