@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import Eventos from './Eventos'
 
 describe('Página de Eventos y Calculadora', () => {
@@ -13,6 +13,7 @@ describe('Página de Eventos y Calculadora', () => {
     const inputGuests = screen.getByLabelText(/Número de invitados/i)
     fireEvent.change(inputGuests, { target: { value: '50' } })
     expect(inputGuests.value).toBe('50')
+    expect(screen.getByText(/\$\s*440\.000/)).toBeInTheDocument()
   })
 
   it('permite cambiar el tipo de servicio de logística', () => {
@@ -20,12 +21,19 @@ describe('Página de Eventos y Calculadora', () => {
     const selectService = screen.getByLabelText(/Logística/i)
     fireEvent.change(selectService, { target: { value: 'retiro' } })
     expect(selectService.value).toBe('retiro')
+    expect(screen.getByText(/\$\s*255\.000/)).toBeInTheDocument()
   })
 
-  it('muestra mensaje de éxito al hacer clic en solicitar cotización', () => {
-    render(<Eventos onNavigate={() => {}} />)
-    const submitButton = screen.getByRole('button', { name: /Solicitar cotización formal/i })
+    it('solicita navegar a contacto al pedir una cotización', () => {
+    const onNavigate = vi.fn()
+    render(<Eventos onNavigate={onNavigate} />)
+
+    const submitButton = screen.getByRole('button', {
+      name: /Solicitar cotización formal/i,
+    })
     fireEvent.click(submitButton)
-    expect(screen.getByText(/prepararemos una propuesta a tu medida/i)).toBeInTheDocument()
+
+    expect(onNavigate).toHaveBeenCalledWith('contacto')
   })
+  
 })
