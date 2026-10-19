@@ -54,7 +54,7 @@ export const products = [
     category: 'Tortas',
     description: 'Crema de vainilla, frutos rojos frescos y masa sablée de mantequilla.',
     image:
-      'https://images.unsplash.com/photo-1464305795204-6f5e7c7f1b8a?auto=format&fit=crop&w=800&q=85',
+      '/images/photo-1653491887846-781545ef38da.avif',
     details: 'Una tarta ligera y fresca con crema de vainilla, frutos rojos de estación y una masa sablée delicadamente crujiente.',
     options: ['Frutos rojos', 'Frutilla y albahaca', 'Mango y maracuyá'],
     price: 28900,
@@ -102,7 +102,7 @@ export const products = [
     category: 'Dulces',
     description: 'Bocados de pâte à choux rellenos de crema y glaseados.',
     image:
-      'https://images.unsplash.com/photo-1614707267537-2b7b3e6e2f6b?auto=format&fit=crop&w=800&q=85',
+      '/images/pexels-viktoriia-kondratiuk-458099300-18330355.jpg',
     details: 'Bocado delicado de pâte à choux, rellenos de crema pastelera de distinto sabor.',
     options: ['Vainilla', 'Café', 'Chocolate', 'Frambuesa', 'Pistacho', 'Matcha'],
     price: 16900,

@@ -24,9 +24,15 @@ export default function Eventos({ onNavigate }) {
   const estimate = (Number(guests) || 0) * offering.pricePerGuest + service.price
 
   function handleSubmit(event) {
-    event.preventDefault()
-    setSubmitted(true)
-  }
+  event.preventDefault()
+  onNavigate('contacto', {
+  offering: offering.name,
+  guests: Number(guests),
+  service: service.name,
+  estimate,
+})
+  setSubmitted(true)
+}
 
   return (
     <main className="page">

@@ -9,10 +9,28 @@ describe('Página de Contacto', () => {
     expect(screen.getByText(/09:00 a 19:00/i)).toBeInTheDocument()
   })
 
-  it('contiene los campos obligatorios del formulario', () => {
+  it('exige los campos obligatorios y valida el formato del correo', () => {
     render(<Contacto />)
-    expect(screen.getByLabelText(/Nombre completo/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Correo electrónico/i)).toBeInTheDocument()
+
+    const nombre = screen.getByLabelText(/Nombre completo/i)
+    const correo = screen.getByLabelText(/Correo electrónico/i)
+    const mensaje = screen.getByLabelText(/Cuéntanos más/i)
+
+    expect(nombre).toBeRequired()
+    expect(correo).toBeRequired()
+    expect(mensaje).toBeRequired()
+
+    expect(nombre).toBeInvalid()
+    expect(correo).toBeInvalid()
+    expect(mensaje).toBeInvalid()
+
+    fireEvent.change(correo, { target: { value: 'alejandra' } })
+    expect(correo).toBeInvalid()
+
+    fireEvent.change(correo, {
+      target: { value: 'alejandra@ejemplo.com' },
+    })
+    expect(correo).toBeValid()
   })
 
   it('muestra el mensaje de confirmación al simular el envío del formulario', () => {
@@ -29,5 +47,8 @@ describe('Página de Contacto', () => {
     
     // 3. Verificamos el resultado
     expect(screen.getByText(/Gracias por escribirnos/i)).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+  'Simulación completada. Tu consulta no se ha enviado ni guardado.'
+)
   })
 })
