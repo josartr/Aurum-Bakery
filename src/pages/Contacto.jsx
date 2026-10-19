@@ -59,7 +59,7 @@ defaultValue={quote
 />
           </div>
           <button className="button button-primary" type="submit">Enviar consulta</button>
-          {submitted && <p className="form-success" role="status">Gracias por escribirnos. Recibimos tu consulta y te responderemos dentro de 24 horas hábiles.</p>}
+          {submitted && <p className="form-success" role="status">Gracias por escribirnos. Simulación completada. Tu consulta no se ha enviado ni guardado.</p>}
         </form>
       </section>
       <section className="container contact-faq">

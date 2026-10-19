@@ -47,5 +47,8 @@ describe('Página de Contacto', () => {
     
     // 3. Verificamos el resultado
     expect(screen.getByText(/Gracias por escribirnos/i)).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+  'Simulación completada. Tu consulta no se ha enviado ni guardado.'
+)
   })
 })
