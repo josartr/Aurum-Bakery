@@ -85,7 +85,7 @@
   width: 25px;
   height: 2px;
   margin: 5px 0;
-  background: var(--petroleum);
+  background: var(--cream);
 }
 
 .page {
@@ -1068,9 +1068,10 @@ h1 em,
   }
 
   .nav-link {
-    padding: 0.75rem 0;
-    text-align: left;
-  }
+  color: var(--petroleum);
+  padding: 0.75rem 0;
+  text-align: left;
+}
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
