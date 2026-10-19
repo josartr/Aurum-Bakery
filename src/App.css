@@ -1227,4 +1227,8 @@ h1 em,
   .estimate-card {
     padding: 1.25rem;
   }
+
+  .estimate-card select {
+  padding-right: 2.5rem;
+}
 }
