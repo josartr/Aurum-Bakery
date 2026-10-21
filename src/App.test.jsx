@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { HashRouter } from 'react-router-dom'
 import App from './App'
 
 describe('Recorrido de cotización', () => {
@@ -11,7 +12,11 @@ describe('Recorrido de cotización', () => {
       .mockImplementation(() => {})
 
     try {
-      render(<App />)
+      render(
+        <HashRouter>
+          <App />
+        </HashRouter>
+      )
 
       expect(
         screen.getByRole('heading', { level: 1 })

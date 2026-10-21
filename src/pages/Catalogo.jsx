@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { products } from '../data/products'
 import { formatCurrency } from '../utils/formatters'
 
-export default function Catalogo() {
+export default function Catalogo({ onAddToCart, onNavigate }) {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Todos')
   const [search, setSearch] = useState('')
@@ -69,9 +69,14 @@ export default function Catalogo() {
               <p>{product.description}</p>
               <div className="product-card-footer">
                 <strong>{formatCurrency(product.price)}</strong>
-                <button className="text-button" onClick={() => setSelectedProduct(product)}>
-                  Ver detalle <span aria-hidden="true">→</span>
-                </button>
+                <div className="product-actions">
+                  <button className="text-button" onClick={() => setSelectedProduct(product)}>
+                    Ver detalle <span aria-hidden="true">→</span>
+                  </button>
+                  <button className="button button-primary add-cart-btn" onClick={() => onAddToCart(product)}>
+                    Agregar
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -107,6 +112,14 @@ export default function Catalogo() {
             <ul>
               {selectedProduct.options.map((option) => <li key={option}>{option}</li>)}
             </ul>
+            <div className="modal-actions">
+              <button className="button button-primary" onClick={() => onAddToCart(selectedProduct)}>
+                Agregar al carrito
+              </button>
+              <button className="button button-secondary" onClick={() => onNavigate('carrito')}>
+                Ver carrito
+              </button>
+            </div>
           </section>
         </div>
       )}
