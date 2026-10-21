@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { products } from '../data/products'
 import { formatCurrency } from '../utils/formatters'
 
@@ -6,7 +6,16 @@ export default function Catalogo({ onAddToCart, onNavigate }) {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Todos')
   const [search, setSearch] = useState('')
+  const [toast, setToast] = useState('')
   const categories = ['Todos', ...new Set(products.map((product) => product.category))]
+
+  useEffect(() => {
+    if (!toast) return undefined
+
+    const timer = window.setTimeout(() => setToast(''), 1800)
+    return () => window.clearTimeout(timer)
+  }, [toast])
+
   const filteredProducts = products.filter((product) => {
     const matchesCategory = activeCategory === 'Todos' || product.category === activeCategory
     const searchTerm = search.trim().toLowerCase()
@@ -19,6 +28,11 @@ export default function Catalogo({ onAddToCart, onNavigate }) {
     return matchesCategory && matchesSearch
   })
 
+  function handleAddToCart(product) {
+    onAddToCart(product)
+    setToast(`${product.name} agregado al carrito`)
+  }
+
   return (
     <main className="page">
       <section className="container page-heading">
@@ -26,6 +40,13 @@ export default function Catalogo({ onAddToCart, onNavigate }) {
         <h1>Descubre nuestras <em>creaciones</em></h1>
         <p className="lead">Una selección de piezas artesanales para tus días especiales, tus regalos y tus celebraciones.</p>
       </section>
+
+      {toast && (
+        <div className="container">
+          <div className="cart-toast" role="status">{toast}</div>
+        </div>
+      )}
+
       <section className="container catalog-toolbar" aria-label="Filtros del catálogo">
         <div className="category-filters" role="group" aria-label="Filtrar por categoría">
           {categories.map((category) => (
@@ -73,7 +94,7 @@ export default function Catalogo({ onAddToCart, onNavigate }) {
                   <button className="text-button" onClick={() => setSelectedProduct(product)}>
                     Ver detalle <span aria-hidden="true">→</span>
                   </button>
-                  <button className="button button-primary add-cart-btn" onClick={() => onAddToCart(product)}>
+                  <button className="button button-primary add-cart-btn" onClick={() => handleAddToCart(product)}>
                     Agregar
                   </button>
                 </div>
@@ -113,7 +134,7 @@ export default function Catalogo({ onAddToCart, onNavigate }) {
               {selectedProduct.options.map((option) => <li key={option}>{option}</li>)}
             </ul>
             <div className="modal-actions">
-              <button className="button button-primary" onClick={() => onAddToCart(selectedProduct)}>
+              <button className="button button-primary" onClick={() => { handleAddToCart(selectedProduct); setSelectedProduct(null) }}>
                 Agregar al carrito
               </button>
               <button className="button button-secondary" onClick={() => onNavigate('carrito')}>

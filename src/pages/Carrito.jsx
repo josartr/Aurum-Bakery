@@ -7,9 +7,16 @@ export default function Carrito({ cart, onUpdateQuantity, onRemoveFromCart, onNa
 
   return (
     <main className="page">
-      <section className="container page-heading">
-        <p className="eyebrow">Tu compra</p>
-        <h1>Carrito <em>de productos</em></h1>
+      <section className="container page-heading cart-header">
+        <div>
+          <p className="eyebrow">Tu compra</p>
+          <h1>Carrito <em>de productos</em></h1>
+        </div>
+        {cart.length > 0 && (
+          <button className="button button-secondary compact" onClick={() => onNavigate('catalogo')}>
+            Seguir comprando
+          </button>
+        )}
       </section>
 
       <section className="container cart-layout">
@@ -54,7 +61,12 @@ export default function Carrito({ cart, onUpdateQuantity, onRemoveFromCart, onNa
         </div>
 
         <aside className="cart-summary">
-          <h2>Resumen</h2>
+          <p className="eyebrow summary-kicker">Resumen</p>
+          <h2>Tu pedido</h2>
+          <div className="summary-row">
+            <span>Productos</span>
+            <strong>{cart.reduce((total, item) => total + item.quantity, 0)}</strong>
+          </div>
           <div className="summary-row">
             <span>Subtotal</span>
             <strong>{formatCurrency(subtotal)}</strong>
@@ -70,6 +82,7 @@ export default function Carrito({ cart, onUpdateQuantity, onRemoveFromCart, onNa
           <button className="button button-primary" disabled={cart.length === 0} onClick={() => onNavigate('contacto')}>
             Continuar compra
           </button>
+          <p className="summary-note">Entrega estimada: 24–48 horas hábiles en Santiago.</p>
         </aside>
       </section>
     </main>

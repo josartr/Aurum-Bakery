@@ -32,6 +32,9 @@ export default function Contacto({ quote = null, cart = [] }) {
      ? buildCartSummary()
      : ''
 
+ const reasonDefault = quote ? 'evento' : cart.length > 0 ? 'pedido' : 'evento'
+ const summaryLabel = cart.length > 0 ? 'Pedido listo para coordinación' : 'Consulta lista para revisión'
+
  return (
    <main className="page">
      <section className="container page-heading">
@@ -73,6 +76,12 @@ export default function Contacto({ quote = null, cart = [] }) {
          </div>
        </aside>
        <form className="contact-form" onSubmit={handleSubmit}>
+         {cart.length > 0 && (
+           <div className="summary-banner" role="status">
+             <span className="eyebrow">Resumen</span>
+             <strong>{summaryLabel}</strong>
+           </div>
+         )}
          <div className="form-field">
            <label htmlFor="name">Nombre completo</label>
            <input id="name" name="name" type="text" placeholder="Tu nombre" required />
@@ -83,7 +92,7 @@ export default function Contacto({ quote = null, cart = [] }) {
          </div>
          <div className="form-field">
            <label htmlFor="reason">¿En qué podemos ayudarte?</label>
-           <select id="reason" name="reason" defaultValue={cart.length > 0 ? 'pedido' : 'evento'}>
+           <select id="reason" name="reason" defaultValue={reasonDefault}>
              <option value="evento">Cotizar un evento</option>
              <option value="pedido">Hacer un pedido</option>
              <option value="personalizada">Torta personalizada</option>
