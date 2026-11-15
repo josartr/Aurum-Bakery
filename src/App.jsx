@@ -11,6 +11,7 @@ import Catalogo from './pages/Catalogo'
 import Nosotros from './pages/Nosotros'
 import Eventos from './pages/Eventos'
 import Contacto from './pages/Contacto'
+import Login from './pages/Login'
 
 function AppContent() {
   const [page, setPage] = useState(() => window.location.hash.replace('#/', '') || 'inicio')
@@ -18,7 +19,9 @@ function AppContent() {
   const [cartOpen, setCartOpen] = useState(false)
 
   function navigate(nextPage, quoteData = null) {
-    const safePage = pages.includes(nextPage) ? nextPage : 'inicio'
+    const safePage = pages.includes(nextPage) || nextPage === 'login'
+  ? nextPage
+  : 'inicio'
 
     if (safePage === 'contacto') {
       setQuote(quoteData)
@@ -40,6 +43,7 @@ function AppContent() {
   }, [])
 
   const content = {
+    login: <Login />,
     inicio: <Inicio onNavigate={navigate} />,
     catalogo: <Catalogo onOpenCart={() => setCartOpen(true)} />,
     nosotros: <Nosotros onNavigate={navigate} />,

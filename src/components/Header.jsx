@@ -33,6 +33,15 @@ function Header({ page, onNavigate, onOpenCart }) {
         </nav>
 
         <div className="header-right">
+
+          <button
+            type="button"
+            className="nav-link"
+            onClick={() => navigate('login')}
+          >
+            Iniciar sesión
+          </button>
+
           <button
             type="button"
             className="header-cart-btn"
