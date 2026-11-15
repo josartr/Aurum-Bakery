@@ -33,22 +33,16 @@ describe('Página de Contacto', () => {
     expect(correo).toBeValid()
   })
 
-  it('muestra el mensaje de confirmación al simular el envío del formulario', () => {
+  it('muestra el mensaje de confirmación al enviar el formulario', () => {
     render(<Contacto />)
-    
-    // 1. Llenamos los campos obligatorios primero
+
     fireEvent.change(screen.getByLabelText(/Nombre completo/i), { target: { value: 'Juan Perez' } })
     fireEvent.change(screen.getByLabelText(/Correo electrónico/i), { target: { value: 'juan@ejemplo.com' } })
     fireEvent.change(screen.getByLabelText(/Cuéntanos más/i), { target: { value: 'Cotización de prueba' } })
-    
-    // 2. Hacemos clic en enviar
+
     const submitButton = screen.getByRole('button', { name: /Enviar consulta/i })
     fireEvent.click(submitButton)
-    
-    // 3. Verificamos el resultado
-    expect(screen.getByText(/Gracias por escribirnos/i)).toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent(
-  'Simulación completada. Tu consulta no se ha enviado ni guardado.'
-)
+
+    expect(screen.getByRole('status')).toHaveTextContent(/Gracias por escribirnos/i)
   })
 })

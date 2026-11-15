@@ -1,1 +1,1 @@
-export const pages = ['inicio', 'catalogo', 'eventos', 'contacto']
+export const pages = ['inicio', 'catalogo', 'nosotros', 'eventos', 'contacto']

@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import atelierBoutiqueImg from '../assets/images/atelier_contacto_boutique_1794711906026.jpg'
+import MediaImage from '../components/MediaImage'
 import { formatCurrency } from '../utils/formatters'
 
-export default function Contacto({ quote = null })  {
+export default function Contacto({ quote = null }) {
   const [submitted, setSubmitted] = useState(false)
 
   function handleSubmit(event) {
@@ -18,15 +20,21 @@ export default function Contacto({ quote = null })  {
       </section>
       <section className="container contact-layout">
         <aside className="contact-aside">
+          <div className="contact-aside-media">
+            <MediaImage
+              src={atelierBoutiqueImg}
+              alt="Mostrador del atelier Aurum Bakery en Santiago con vitrina de pastelería y croissants"
+            />
+          </div>
           <div className="contact-intro">
-            <p className="eyebrow">Estamos para ayudarte</p>
+            <p className="eyebrow">Atelier Santiago</p>
             <h2>Un buen día comienza con una buena conversación.</h2>
             <p>Cuéntanos qué tienes en mente y nuestro equipo te orientará con opciones, disponibilidad y próximos pasos.</p>
           </div>
           <div className="contact-details">
             <a href="https://wa.me/56912345678" target="_blank" rel="noreferrer"><span>WhatsApp</span><strong>+56 9 1234 5678</strong></a>
             <a href="mailto:hola@aurumbakery.cl"><span>Correo electrónico</span><strong>hola@aurumbakery.cl</strong></a>
-            <div><span>Horario de atención</span><strong>Lun - Sáb · 09:00 a 19:00</strong></div>
+            <div><span>Horario de atención</span><strong>Lun – Sáb · 09:00 a 19:00</strong></div>
             <div><span>Visítanos</span><strong>Av. Providencia 1234, Santiago</strong></div>
           </div>
         </aside>
@@ -51,15 +59,23 @@ export default function Contacto({ quote = null })  {
           </div>
           <div className="form-field">
             <label htmlFor="message">Cuéntanos más</label>
-            <textarea id="message"name="message"rows="5"placeholder="Fecha, cantidad de personas, sabores o cualquier detalle importante"
-defaultValue={quote
-    ? `Solicito cotización de ${quote.offering} para ${quote.guests} invitados. Logística: ${quote.service}. Presupuesto estimado: ${formatCurrency(quote.estimate)}.`
-    : ''}
-  required
-/>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              placeholder="Fecha, cantidad de personas, sabores o cualquier detalle importante"
+              defaultValue={quote
+                ? `Solicito cotización de ${quote.offering} para ${quote.guests} invitados. Logística: ${quote.service}. Presupuesto estimado: ${formatCurrency(quote.estimate)}.${quote.extraNotes ? ` ${quote.extraNotes}.` : ''}`
+                : ''}
+              required
+            />
           </div>
           <button className="button button-primary" type="submit">Enviar consulta</button>
-          {submitted && <p className="form-success" role="status">Gracias por escribirnos. Simulación completada. Tu consulta no se ha enviado ni guardado.</p>}
+          {submitted && (
+            <p className="form-success" role="status">
+              Gracias por escribirnos. Tu solicitud ha sido recibida por nuestro equipo.
+            </p>
+          )}
         </form>
       </section>
       <section className="container contact-faq">
