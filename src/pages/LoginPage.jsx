@@ -1,97 +1,64 @@
+
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { authService } from '../services'
-import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const { login } = useAuth()
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('')
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
-  }
-
-  const handleSubmit = async (event) => {
+  function handleSubmit(event) {
     event.preventDefault()
-    setLoading(true)
-    setError('')
-
-    try {
-      const response = await authService.login(form)
-      const role = response?.role
-
-      localStorage.setItem('token', response.token)
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          email: response.email,
-          role,
-          fullName: response.fullName,
-        }),
-      )
-
-      await login(response)
-
-      if (role === 'ADMIN') {
-        navigate('/admin', { replace: true })
-      } else {
-        navigate('/', { replace: true })
-      }
-    } catch (err) {
-      const message = err?.response?.data?.message || 'Credenciales inválidas. Intenta nuevamente.'
-      setError(message)
-    } finally {
-      setLoading(false)
-    }
+    setMessage('Formulario listo. Falta conectar la autenticación del backend.')
   }
 
   return (
-    <main className="page auth-page">
-      <section className="container auth-card">
-        <div className="auth-header">
-          <p className="eyebrow">Aurum Bakery</p>
-          <h1>Inicia sesión</h1>
+    <main className="page">
+      <section className="container" style={{ maxWidth: 520 }}>
+        <div className="page-heading">
+          <p className="eyebrow">Bienvenido a Aurum Bakery</p>
+          <h1>Iniciar sesión</h1>
+          <p>Accede con tu correo y contraseña.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>
-            <span>Email</span>
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label htmlFor="login-email">Correo electrónico</label>
             <input
+              id="login-email"
               type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               required
-              placeholder="tu@email.com"
             />
-          </label>
+          </div>
 
-          <label>
-            <span>Contraseña</span>
+          <div className="form-field">
+            <label htmlFor="login-password">Contraseña</label>
             <input
+              id="login-password"
               type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               required
-              placeholder="••••••••"
             />
-          </label>
+          </div>
 
-          {error && <p className="form-error">{error}</p>}
-
-          <button type="submit" className="button button-primary" disabled={loading}>
-            {loading ? 'Ingresando...' : 'Entrar'}
+          <button className="button button-primary" type="submit">
+            Ingresar
           </button>
-        </form>
 
-        <p className="auth-link">
-          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
-        </p>
+          {message && <p role="status">{message}</p>}
+
+            <p style={{ marginTop: '1rem' }}>
+            ¿Aún no tienes cuenta?{' '}
+            <a href="#/register" className="text-button">
+                Crear cuenta
+            </a>
+            </p>
+
+        </form>
       </section>
     </main>
   )

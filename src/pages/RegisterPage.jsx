@@ -1,89 +1,100 @@
+
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { authService } from '../services'
 
 export default function RegisterPage() {
-  const navigate = useNavigate()
-  const [form, setForm] = useState({ fullName: '', email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [nombre, setNombre] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmar, setConfirmar] = useState('')
+  const [mensaje, setMensaje] = useState('')
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
-  }
-
-  const handleSubmit = async (event) => {
+  function handleSubmit(event) {
     event.preventDefault()
-    setLoading(true)
-    setError('')
 
-    try {
-      await authService.register(form)
-      navigate('/login', { replace: true })
-    } catch (err) {
-      const message = err?.response?.data?.message || 'No se pudo completar el registro.'
-      setError(message)
-    } finally {
-      setLoading(false)
+    if (password.length < 8) {
+      setMensaje('La contraseña debe tener al menos 8 caracteres.')
+      return
     }
+
+    if (password !== confirmar) {
+      setMensaje('Las contraseñas no coinciden.')
+      return
+    }
+
+    setMensaje(
+      'Datos validados correctamente. El registro estará disponible al conectar el backend.'
+    )
   }
 
   return (
-    <main className="page auth-page">
-      <section className="container auth-card">
-        <div className="auth-header">
-          <p className="eyebrow">Aurum Bakery</p>
+    <main className="page">
+      <section className="container" style={{ maxWidth: 520 }}>
+        <div className="page-heading">
+          <p className="eyebrow">Únete a Aurum Bakery</p>
           <h1>Crear cuenta</h1>
+          <p>Regístrate para disfrutar de nuestras creaciones.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>
-            <span>Nombre completo</span>
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label htmlFor="registro-nombre">Nombre completo</label>
             <input
+              id="registro-nombre"
               type="text"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
               required
-              placeholder="Tu nombre completo"
             />
-          </label>
+          </div>
 
-          <label>
-            <span>Email</span>
+          <div className="form-field">
+            <label htmlFor="registro-email">Correo electrónico</label>
             <input
+              id="registro-email"
               type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="tu@email.com"
             />
-          </label>
+          </div>
 
-          <label>
-            <span>Contraseña</span>
+          <div className="form-field">
+            <label htmlFor="registro-password">Contraseña</label>
             <input
+              id="registro-password"
               type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={8}
               required
-              placeholder="Mínimo 8 caracteres"
             />
-          </label>
+          </div>
 
-          {error && <p className="form-error">{error}</p>}
+          <div className="form-field">
+            <label htmlFor="registro-confirmar">Confirmar contraseña</label>
+            <input
+              id="registro-confirmar"
+              type="password"
+              value={confirmar}
+              onChange={(e) => setConfirmar(e.target.value)}
+              required
+            />
+          </div>
 
-          <button type="submit" className="button button-primary" disabled={loading}>
-            {loading ? 'Creando cuenta...' : 'Registrarme'}
+          <button className="button button-primary" type="submit">
+            Verificar datos
           </button>
-        </form>
 
-        <p className="auth-link">
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
-        </p>
+          {mensaje && <p role="status">{mensaje}</p>}
+
+            <p style={{ marginTop: '1rem' }}>
+            ¿Ya tienes una cuenta?{' '}
+            <a href="#/login" className="text-button">
+                Iniciar sesión
+            </a>
+            </p>
+
+        </form>
       </section>
     </main>
   )

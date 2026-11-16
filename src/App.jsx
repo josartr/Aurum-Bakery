@@ -18,88 +18,97 @@ import Eventos from './pages/Eventos'
 import Contacto from './pages/Contacto'
 
 const routeByPage = {
-  inicio: '/',
-  catalogo: '/catalogo',
-  nosotros: '/nosotros',
-  eventos: '/eventos',
-  contacto: '/contacto',
+    inicio: '/',
+    catalogo: '/catalogo',
+    nosotros: '/nosotros',
+    eventos: '/eventos',
+    contacto: '/contacto',
+    login: '/login',
+    register: '/register',
+    admin: '/admin',
 }
 
 function AppContent() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [cartOpen, setCartOpen] = useState(false)
-  const [quote, setQuote] = useState(null)
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [cartOpen, setCartOpen] = useState(false)
+    const [quote, setQuote] = useState(null)
 
-  const currentPage = (() => {
-    const match = Object.entries(routeByPage).find(([, path]) => path === location.pathname)
-    return match ? match[0] : 'inicio'
-  })()
+    const currentPage = (() => {
+        const match = Object.entries(routeByPage).find(([, path]) => path === location.pathname)
+        return match ? match[0] : 'inicio'
+    })()
 
-  function handleNavigate(nextPage, quoteData = null) {
-    const safePage = pages.includes(nextPage) ? nextPage : 'inicio'
+    function handleNavigate(nextPage, quoteData = null) {
+        const normalizedPage = nextPage === 'registro' ? 'register' : nextPage
 
-    if (safePage === 'contacto') {
-      setQuote(quoteData)
-    } else {
-      setQuote(null)
+        const safePage =
+            pages.includes(normalizedPage) ||
+            ['login', 'register', 'admin'].includes(normalizedPage)
+                ? normalizedPage
+                : 'inicio'
+
+        if (safePage === 'contacto') {
+            setQuote(quoteData)
+        } else {
+            setQuote(null)
+        }
+
+        navigate(routeByPage[safePage])
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    navigate(routeByPage[safePage])
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    const content = {
+        login: <LoginPage onNavigate={handleNavigate} />,
+        register: <RegisterPage onNavigate={handleNavigate} />,
+        admin: (
+            <ProtectedRoute requiredRole="ADMIN">
+                <AdminDashboardPage />
+            </ProtectedRoute>
+        ),
+        inicio: <Inicio onNavigate={handleNavigate} />,
+        catalogo: <Catalogo onOpenCart={() => setCartOpen(true)} />,
+        nosotros: <Nosotros onNavigate={handleNavigate} />,
+        eventos: <Eventos onNavigate={handleNavigate} />,
+        contacto: <Contacto key={quote ? `${quote.offering}-${quote.guests}-${quote.service}` : 'default'} quote={quote} />,
+    }[currentPage] || <Inicio onNavigate={handleNavigate} />
 
-  const content = {
-    inicio: <Inicio onNavigate={handleNavigate} />,
-    catalogo: <Catalogo onOpenCart={() => setCartOpen(true)} />,
-    nosotros: <Nosotros onNavigate={handleNavigate} />,
-    eventos: <Eventos onNavigate={handleNavigate} />,
-    contacto: <Contacto key={quote ? `${quote.offering}-${quote.guests}-${quote.service}` : 'default'} quote={quote} />,
-  }[currentPage] || <Inicio onNavigate={handleNavigate} />
-
-  return (
-    <div className="app-shell">
-      <Header page={currentPage} onNavigate={handleNavigate} onOpenCart={() => setCartOpen(true)} />
-      {content}
-      <Footer onNavigate={handleNavigate} />
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} onNavigate={handleNavigate} />
-    </div>
-  )
+    return (
+        <div className="app-shell">
+            <Header page={currentPage} onNavigate={handleNavigate} onOpenCart={() => setCartOpen(true)} />
+            {content}
+            <Footer onNavigate={handleNavigate} />
+            <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} onNavigate={handleNavigate} />
+        </div>
+    )
 }
 
 function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<AppContent />} />
-      <Route path="/catalogo" element={<AppContent />} />
-      <Route path="/nosotros" element={<AppContent />} />
-      <Route path="/eventos" element={<AppContent />} />
-      <Route path="/contacto" element={<AppContent />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requiredRole="ADMIN">
-            <AdminDashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
+    return (
+        <Routes>
+            <Route path="/" element={<AppContent />} />
+            <Route path="/catalogo" element={<AppContent />} />
+            <Route path="/nosotros" element={<AppContent />} />
+            <Route path="/eventos" element={<AppContent />} />
+            <Route path="/contacto" element={<AppContent />} />
+            <Route path="/login" element={<AppContent />} />
+            <Route path="/register" element={<AppContent />} />
+            <Route path="/admin" element={<AppContent />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    )
 }
 
 function App() {
-  return (
-    <HashRouter>
-      <AuthProvider>
-        <CartProvider>
-          <AppRoutes />
-        </CartProvider>
-      </AuthProvider>
-    </HashRouter>
-  )
+    return (
+        <HashRouter>
+            <AuthProvider>
+                <CartProvider>
+                    <AppRoutes />
+                </CartProvider>
+            </AuthProvider>
+        </HashRouter>
+    )
 }
 
 export default App
