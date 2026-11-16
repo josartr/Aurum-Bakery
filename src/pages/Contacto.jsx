@@ -1,14 +1,37 @@
 import { useState } from 'react'
 import atelierBoutiqueImg from '../assets/images/atelier_contacto_boutique_1794711906026.jpg'
 import MediaImage from '../components/MediaImage'
+import { contactService } from '../services'
 import { formatCurrency } from '../utils/formatters'
 
 export default function Contacto({ quote = null }) {
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setSubmitted(true)
+    const formData = new FormData(event.currentTarget)
+    const payload = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone') || '',
+      subject: formData.get('subject') || formData.get('reason') || 'Consulta',
+      message: formData.get('message'),
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      await contactService.send(payload)
+      setSubmitted(true)
+      event.currentTarget.reset()
+    } catch (err) {
+      setError(err?.response?.data?.message || 'No se pudo enviar tu mensaje. Intenta nuevamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -48,6 +71,10 @@ export default function Contacto({ quote = null }) {
             <input id="email" name="email" type="email" placeholder="tucorreo@ejemplo.com" required />
           </div>
           <div className="form-field">
+            <label htmlFor="phone">Teléfono</label>
+            <input id="phone" name="phone" type="tel" placeholder="+56 9 1234 5678" />
+          </div>
+          <div className="form-field">
             <label htmlFor="reason">¿En qué podemos ayudarte?</label>
             <select id="reason" name="reason" defaultValue="evento">
               <option value="evento">Cotizar un evento</option>
@@ -70,7 +97,10 @@ export default function Contacto({ quote = null }) {
               required
             />
           </div>
-          <button className="button button-primary" type="submit">Enviar consulta</button>
+          <button className="button button-primary" type="submit" disabled={loading}>
+            {loading ? 'Enviando...' : 'Enviar consulta'}
+          </button>
+          {error && <p className="form-error">{error}</p>}
           {submitted && (
             <p className="form-success" role="status">
               Gracias por escribirnos. Tu solicitud ha sido recibida por nuestro equipo.
