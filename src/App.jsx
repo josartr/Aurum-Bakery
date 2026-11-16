@@ -13,6 +13,8 @@ import Eventos from './pages/Eventos'
 import Contacto from './pages/Contacto'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
+import AdminDashboard from './pages/AdminDashboard'
+import Inventario from './pages/Inventario'
 
 function AppContent() {
   const [page, setPage] = useState(() => window.location.hash.replace('#/', '') || 'inicio')
@@ -54,6 +56,8 @@ function AppContent() {
     nosotros: <Nosotros onNavigate={navigate} />,
     eventos: <Eventos onNavigate={navigate} />,
     contacto: <Contacto key={quote ? `${quote.offering}-${quote.guests}-${quote.service}` : 'default'} quote={quote} />,
+    'admin-preview': <AdminDashboard />,
+    'inventario-preview': <Inventario />,
   }[page] || <Inicio onNavigate={navigate} />
 
   return (
