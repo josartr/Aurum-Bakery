@@ -50,6 +50,14 @@ export default function Login() {
           </button>
 
           {message && <p role="status">{message}</p>}
+
+            <p style={{ marginTop: '1rem' }}>
+            ¿Aún no tienes cuenta?{' '}
+            <a href="#/registro" className="text-button">
+                Crear cuenta
+            </a>
+            </p>
+
         </form>
       </section>
     </main>

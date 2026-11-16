@@ -86,6 +86,14 @@ export default function Registro() {
           </button>
 
           {mensaje && <p role="status">{mensaje}</p>}
+
+            <p style={{ marginTop: '1rem' }}>
+            ¿Ya tienes una cuenta?{' '}
+            <a href="#/login" className="text-button">
+                Iniciar sesión
+            </a>
+            </p>
+
         </form>
       </section>
     </main>
