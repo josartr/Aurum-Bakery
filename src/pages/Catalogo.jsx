@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import MediaImage from '../components/MediaImage'
 import { ProductGridSkeleton } from '../components/ProductSkeleton'
-import { products } from '../data/products'
+import { productService } from '../services'
 import { useCart } from '../hooks/useCart'
 import { formatCurrency } from '../utils/formatters'
 
@@ -9,6 +9,7 @@ const CATEGORY_ORDER = ['Todos', 'Tortas', 'Bollería', 'Pasteles', 'Galletas', 
 
 export default function Catalogo({ onOpenCart, loading = false }) {
   const { addItem } = useCart()
+  const [products, setProducts] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [selectedOption, setSelectedOption] = useState('')
   const [selectedSize, setSelectedSize] = useState(null)
@@ -17,9 +18,23 @@ export default function Catalogo({ onOpenCart, loading = false }) {
   const [search, setSearch] = useState('')
   const [addedKey, setAddedKey] = useState('')
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [fetchError, setFetchError] = useState('')
   const filterTimerRef = useRef(null)
 
   useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const { data } = await productService.getAll()
+        setProducts(data || [])
+      } catch (error) {
+        console.error('Error loading products', error)
+        setFetchError('No se pudieron cargar los productos.')
+        setProducts([])
+      }
+    }
+
+    loadProducts()
+
     return () => {
       if (filterTimerRef.current) window.clearTimeout(filterTimerRef.current)
     }
@@ -164,6 +179,12 @@ export default function Catalogo({ onOpenCart, loading = false }) {
         </p>
         <p>Producción artesanal en lotes pequeños</p>
       </section>
+
+      {fetchError && (
+        <div className="container">
+          <p className="form-error">{fetchError}</p>
+        </div>
+      )}
 
       {showSkeleton ? (
         <ProductGridSkeleton count={activeCategory === 'Todos' ? 6 : 3} />
