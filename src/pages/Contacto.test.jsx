@@ -1,6 +1,13 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import Contacto from './Contacto'
+import { contactService } from '../services'
+
+vi.mock('../services', () => ({
+  contactService: {
+    send: vi.fn().mockResolvedValue({ data: { id: 1 } }),
+  },
+}))
 
 describe('Página de Contacto', () => {
   it('renderiza la información de contacto y horarios', () => {
@@ -33,7 +40,7 @@ describe('Página de Contacto', () => {
     expect(correo).toBeValid()
   })
 
-  it('muestra el mensaje de confirmación al enviar el formulario', () => {
+  it('muestra el mensaje de confirmación al enviar el formulario', async () => {
     render(<Contacto />)
 
     fireEvent.change(screen.getByLabelText(/Nombre completo/i), { target: { value: 'Juan Perez' } })
@@ -43,6 +50,9 @@ describe('Página de Contacto', () => {
     const submitButton = screen.getByRole('button', { name: /Enviar consulta/i })
     fireEvent.click(submitButton)
 
-    expect(screen.getByRole('status')).toHaveTextContent(/Gracias por escribirnos/i)
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent(/Gracias por escribirnos/i)
+    })
+    expect(contactService.send).toHaveBeenCalledTimes(1)
   })
 })

@@ -12,6 +12,10 @@ export const contactService = {
   markAsRead(id) {
     return api.patch(`/contact/${id}/read`)
   },
+
+  delete(id) {
+    return api.delete(`/contact/${id}`)
+  },
 }
 
 export default contactService

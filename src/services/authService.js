@@ -3,27 +3,30 @@ import api from './api'
 const AUTH_KEY = 'token'
 const USER_KEY = 'user'
 
+function persistSession(data) {
+  if (data?.token) {
+    localStorage.setItem(AUTH_KEY, data.token)
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify({
+        email: data.email,
+        role: data.role,
+        fullName: data.fullName,
+      }),
+    )
+  }
+}
+
 export const authService = {
   async login(credentials) {
     const { data } = await api.post('/auth/login', credentials)
-
-    if (data?.token) {
-      localStorage.setItem(AUTH_KEY, data.token)
-      localStorage.setItem(
-        USER_KEY,
-        JSON.stringify({
-          email: data.email,
-          role: data.role,
-          fullName: data.fullName,
-        }),
-      )
-    }
-
+    persistSession(data)
     return data
   },
 
   async register(payload) {
     const { data } = await api.post('/auth/register', payload)
+    persistSession(data)
     return data
   },
 

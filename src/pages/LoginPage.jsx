@@ -1,14 +1,33 @@
-
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { authService } from '../services'
 
 export default function LoginPage() {
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setMessage('Formulario listo. Falta conectar la autenticación del backend.')
+    setError('')
+    setLoading(true)
+
+    try {
+      const authData = await authService.login({
+        email: email.trim(),
+        password,
+      })
+      await login(authData)
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          'No pudimos iniciar sesión. Verifica tus credenciales.',
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -45,19 +64,22 @@ export default function LoginPage() {
             />
           </div>
 
-          <button className="button button-primary" type="submit">
-            Ingresar
+          <button className="button button-primary" type="submit" disabled={loading}>
+            {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
 
-          {message && <p role="status">{message}</p>}
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
 
-            <p style={{ marginTop: '1rem' }}>
+          <p style={{ marginTop: '1rem' }}>
             ¿Aún no tienes cuenta?{' '}
             <a href="#/register" className="text-button">
-                Crear cuenta
+              Crear cuenta
             </a>
-            </p>
-
+          </p>
         </form>
       </section>
     </main>

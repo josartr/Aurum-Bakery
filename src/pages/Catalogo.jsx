@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import MediaImage from '../components/MediaImage'
 import { ProductGridSkeleton } from '../components/ProductSkeleton'
-import { products } from '../data/products'
+import { products as staticProducts } from '../data/products'
+import { bffService } from '../services'
+import { mergeCatalogProducts } from '../utils/catalogMapper'
 import { useCart } from '../hooks/useCart'
 import { formatCurrency } from '../utils/formatters'
 
@@ -16,6 +18,7 @@ export default function Catalogo({ onOpenCart, loading = false }) {
   const [activeCategory, setActiveCategory] = useState('Todos')
   const [search, setSearch] = useState('')
   const [addedKey, setAddedKey] = useState('')
+  const [catalogProducts, setCatalogProducts] = useState(staticProducts)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const filterTimerRef = useRef(null)
 
@@ -25,10 +28,36 @@ export default function Catalogo({ onOpenCart, loading = false }) {
     }
   }, [])
 
-  const availableCategories = new Set(products.map((product) => product.category))
-  const categories = CATEGORY_ORDER.filter((cat) => cat === 'Todos' || availableCategories.has(cat))
+  useEffect(() => {
+    if (loading) return undefined
+    let active = true
 
-  const filteredProducts = products.filter((product) => {
+    bffService
+      .getCatalogView()
+      .then((res) => {
+        if (!active) return
+        const apiProducts = res?.data?.products
+        if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+          setCatalogProducts(mergeCatalogProducts(apiProducts))
+        }
+      })
+      .catch(() => {
+        // Mantiene el catálogo local como respaldo si el backend no está disponible
+      })
+
+    return () => {
+      active = false
+    }
+  }, [loading])
+
+  const availableCategories = new Set(catalogProducts.map((product) => product.category))
+  const extraCategories = [...availableCategories].filter((cat) => !CATEGORY_ORDER.includes(cat))
+  const categories = [
+    ...CATEGORY_ORDER.filter((cat) => cat === 'Todos' || availableCategories.has(cat)),
+    ...extraCategories,
+  ]
+
+  const filteredProducts = catalogProducts.filter((product) => {
     const matchesCategory = activeCategory === 'Todos' || product.category === activeCategory
     const searchTerm = search.trim().toLowerCase()
     const matchesSearch =

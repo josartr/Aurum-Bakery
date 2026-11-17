@@ -1,29 +1,51 @@
-
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { authService } from '../services'
 
 export default function RegisterPage() {
+  const { login } = useAuth()
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmar, setConfirmar] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
+    setError('')
 
-    if (password.length < 8) {
-      setMensaje('La contraseña debe tener al menos 8 caracteres.')
+    if (nombre.trim().length < 2) {
+      setError('El nombre debe tener al menos 2 caracteres.')
+      return
+    }
+
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.')
       return
     }
 
     if (password !== confirmar) {
-      setMensaje('Las contraseñas no coinciden.')
+      setError('Las contraseñas no coinciden.')
       return
     }
 
-    setMensaje(
-      'Datos validados correctamente. El registro estará disponible al conectar el backend.'
-    )
+    setLoading(true)
+    try {
+      const authData = await authService.register({
+        fullName: nombre.trim(),
+        email: email.trim(),
+        password,
+      })
+      await login(authData)
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          'No pudimos crear tu cuenta. Intenta nuevamente.',
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -41,6 +63,7 @@ export default function RegisterPage() {
             <input
               id="registro-nombre"
               type="text"
+              minLength={2}
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               required
@@ -65,7 +88,7 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              minLength={8}
+              minLength={6}
               required
             />
           </div>
@@ -81,19 +104,22 @@ export default function RegisterPage() {
             />
           </div>
 
-          <button className="button button-primary" type="submit">
-            Verificar datos
+          <button className="button button-primary" type="submit" disabled={loading}>
+            {loading ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
 
-          {mensaje && <p role="status">{mensaje}</p>}
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
 
-            <p style={{ marginTop: '1rem' }}>
+          <p style={{ marginTop: '1rem' }}>
             ¿Ya tienes una cuenta?{' '}
             <a href="#/login" className="text-button">
-                Iniciar sesión
+              Iniciar sesión
             </a>
-            </p>
-
+          </p>
         </form>
       </section>
     </main>

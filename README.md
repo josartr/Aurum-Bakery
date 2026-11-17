@@ -1,102 +1,131 @@
-# Aurum Bakery
+# Aurum Bakery — Frontend (React 19 + Vite)
 
-Sitio web de **Aurum Bakery**, pastelería artesanal y taller en Providencia, Santiago de Chile. Aplicación SPA construida con React y Vite que combina catálogo interactivo, carrito persistente, sección editorial de historia del obrador y cotizador de mesas dulces para eventos.
+Sitio web y aplicación e-commerce de **Aurum Bakery**, pastelería artesanal y taller en Providencia, Santiago de Chile. SPA construida con React, Vite, `HashRouter` y Axios, conectada al backend de microservicios **`aurum-bakery-backend`** a través de su API Gateway (`:8080`).
+
+---
 
 ## Funcionalidades
 
-- **Inicio (`#/inicio`)**: Hero editorial con carrusel de 4 diapositivas, sección cálida **Acerca de nosotros**, pilares de oficio artesanal, selección de favoritos de la casa y llamado a eventos.
-- **Catálogo interactivo (`#/catalogo`)**:
-  - **24 productos** con fotografía de estudio local organizada en 6 categorías: **Tortas**, **Bollería**, **Pasteles**, **Galletas**, **Panadería** y **Brunch** (`Brunch Aurum` y `Brunch Americano` individuales).
-  - **Skeleton screens minimalistas** (`ProductGridSkeleton`, `ProductCardSkeleton` y `MediaImage`) durante transiciones de categoría y carga de imágenes.
-  - **3 tamaños adaptados por tipo de torta** (porciones y precios dinámicos según arquitectura de cada torta).
-  - **Selección guiada**: al presionar **Añadir al carrito** en productos con múltiples sabores, rellenos o tamaños se abre el modal de detalle para elegir las opciones antes de agregarlos.
-  - Buscador en tiempo real por nombre, categoría o relleno.
-- **Acerca de nosotros (`#/nosotros`)**: Historia del obrador en Providencia, pilares de oficio, hospitalidad y materias primas nobles.
-- **Eventos (`#/eventos`)**: Hero editorial, 4 categorías de celebraciones, 3 paquetes de mesas dulces (20, 50 y 100 invitados), carta de sabores (bizcochos, rellenos y coberturas), calculadora interactiva, formulario de cotización y 5 preguntas frecuentes (FAQ).
-- **Contacto (`#/contacto`)**: Información de atención del atelier, validación HTML y envío prellenado de solicitudes desde Eventos.
-- **Carrito lateral (`CartDrawer`)**: Estado global (`CartContext`) con persistencia en `localStorage`, control de cantidades, selección de retiro en tienda o despacho y resumen de pedido.
-- **Identidad visual unificada**: Cabecera y pie de página en petróleo profundo (`#0D3B44`), superficies en alabastro (`#FAF8F4`), acentos en oro champagne (`#C9A449`), isotipo SVG propio (`BrandLogo`, `favicon.svg`) y navegación por hash routing sin servidor adicional.
+- **Inicio (`#/inicio`):** Hero editorial con carrusel de 4 diapositivas, sección **Acerca de nosotros**, pilares del oficio artesanal, productos destacados sincronizados con el backend y llamado a eventos.
+- **Catálogo interactivo híbrido (`#/catalogo`):**
+  - Se conecta a `GET /api/bff/catalog-view` y fusiona los datos en vivo de PostgreSQL (precios, stock, altas y eliminaciones desde Admin) con los metadatos locales de `src/data/products.js` mediante `src/utils/catalogMapper.js`.
+  - Conserva las **24 creaciones** con fotografía local, **6 categorías** (**Tortas**, **Bollería**, **Pasteles**, **Galletas**, **Panadería**, **Brunch**), skeletons minimalistas, buscador en tiempo real y modal con sabores/variedades y 3 tamaños por torta.
+  - Los productos nuevos creados desde el panel Admin aparecen automáticamente en el catálogo.
+- **Autenticación (`#/login`, `#/register`):**
+  - Login (`POST /api/auth/login`) y registro de clientes (`POST /api/auth/register`, contraseña mínima de 6 caracteres) con persistencia de sesión JWT en `localStorage` (`AuthContext`).
+  - Redirección automática según rol: `ADMIN` → `#/admin`, `CLIENT` → `#/`.
+- **Panel Administrativo (`#/admin`, protegido por `ProtectedRoute` con `requiredRole="ADMIN"`):**
+  - Métricas agregadas vía BFF (`GET /api/bff/admin-dashboard`): total de usuarios, total de productos y mensajes sin leer (`unreadMessagesCount`).
+  - Creación y eliminación de productos (`POST /api/products`, `DELETE /api/products/{id}`).
+  - Bandeja de mensajes de contacto (`GET /api/contact`), marcar como leído (`PATCH /api/contact/{id}/read`) y eliminar (`DELETE /api/contact/{id}`).
+- **Eventos (`#/eventos`) y Contacto (`#/contacto`):** Calculadora interactiva de mesas dulces con cotización prellenada hacia `#/contacto` y envío directo al backend (`POST /api/contact`).
+- **Carrito lateral (`CartDrawer`):** Persistencia en `localStorage` (`CartContext`), control de cantidades y selección de retiro en tienda o despacho.
+
+---
+
+## Conexión con el Backend (`aurum-bakery-backend`)
+
+1. Levantar primero el backend Dockerizado en `aurum-bakery-backend`:
+   ```bash
+   docker compose up -d
+   ```
+   Esto expone el API Gateway en `http://localhost:8080` (con CORS habilitado para `http://localhost:3000`).
+
+2. Verificar el archivo `.env` en la raíz de `Aurum-Bakery`:
+   ```env
+   VITE_API_URL=http://localhost:8080/api
+   ```
+
+3. Levantar el frontend localmente con Vite (no requiere Docker):
+   ```bash
+   npm install
+   npm run dev
+   ```
+   La aplicación queda disponible en **`http://localhost:3000`**.
+
+> **Credenciales de prueba (Admin semilla Flyway):** `admin@tienda.cl` / `admin123`.
+> Documentación detallada, bitácora de integración, guía de estudio y solicitudes HTTP explicadas disponibles en `../aurum-bakery-backend/docs/BITACORA_GUIA_ESTUDIO_HTTP.md`.
+
+---
 
 ## Tecnologías
 
-- React 19
+- React 19 + React Router DOM 7 (`HashRouter`)
 - Vite 8
-- JavaScript moderno (ES Modules)
-- CSS personalizado y responsive (`index.css`, `App.css`)
-- Google Fonts: `Playfair Display` y `DM Sans`
+- Axios (interceptores JWT y manejo de `401` compatible con `HashRouter`)
+- CSS personalizado (`index.css`, `App.css`)
 - Vitest + Testing Library (`@testing-library/react`, `jsdom`) y ESLint
 
-## Ejecutar localmente
+---
+
+## Scripts disponibles
 
 ```bash
-npm install
+# Desarrollo en http://localhost:3000
 npm run dev
-```
 
-Compilar para producción:
-
-```bash
+# Compilación de producción
 npm run build
-```
 
-Previsualizar el build de producción:
-
-```bash
+# Previsualización del build
 npm run preview
-```
 
-Revisar calidad del código (lint):
-
-```bash
+# Linter
 npm run lint
-```
 
-Ejecutar pruebas unitarias y de componentes:
-
-```bash
+# Pruebas unitarias y de componentes
 npx vitest run
 ```
 
-## Estructura
+---
+
+## Estructura del proyecto
 
 ```text
 public/
-└── favicon.svg                # Isotipo vectorial de Aurum Bakery
+└── favicon.svg                  # Isotipo vectorial de Aurum Bakery
 src/
-├── assets/
-│   └── images/                # 24 fotografías de catálogo, héroes y secciones editoriales
+├── assets/images/               # Fotografías locales de catálogo, héroes y atelier
 ├── components/
-│   ├── BrandLogo.jsx          # Isotipo BrandMark e ícono CartIcon
-│   ├── CartDrawer.jsx         # Panel lateral del carrito y confirmación de pedido
-│   ├── Footer.jsx             # Pie de página institucional y navegación
-│   ├── Header.jsx             # Cabecera principal y acceso al carrito
-│   ├── MediaImage.jsx         # Carga de imágenes con skeleton y fallback vectorial
-│   └── ProductSkeleton.jsx    # Marcadores skeleton minimalistas para la grilla
+│   ├── AdminRoute.jsx           # Guardia heredado (ruta admin usa ProtectedRoute)
+│   ├── BrandLogo.jsx            # Isotipo BrandMark e ícono CartIcon
+│   ├── CartDrawer.jsx           # Panel lateral del carrito
+│   ├── Footer.jsx               # Pie de página institucional
+│   ├── Header.jsx               # Navegación, sesión de usuario y acceso Admin
+│   ├── MediaImage.jsx           # Carga de imágenes con skeleton y fallback
+│   ├── ProductSkeleton.jsx      # Skeletons de grilla
+│   └── ProtectedRoute.jsx       # Protección de rutas autenticadas y por rol
 ├── context/
-│   ├── CartContext.jsx        # Provider y persistencia del carrito en localStorage
-│   └── cartContextObject.js   # Definición del contexto del carrito
+│   ├── AuthContext.jsx          # Estado de sesión JWT, login, logout y rol
+│   ├── CartContext.jsx          # Estado global del carrito en localStorage
+│   └── cartContextObject.js
 ├── data/
-│   ├── pages.js               # Rutas válidas de la SPA
-│   └── products.js            # Catálogo completo con categorías, opciones y tamaños
+│   ├── pages.js                 # Páginas públicas de navegación
+│   └── products.js              # Catálogo base (metadatos ricos, sabores y tamaños)
 ├── hooks/
-│   └── useCart.js             # Hook de acceso al carrito
+│   └── useCart.js
 ├── pages/
-│   ├── Catalogo.jsx           # Catálogo filtrable, skeletons y modal de selección
-│   ├── Contacto.jsx           # Formulario de contacto y horario del atelier
-│   ├── Eventos.jsx            # Paquetes de mesas dulces, sabores, cotizador y FAQ
-│   ├── Inicio.jsx             # Portada, carrusel, Acerca de nosotros y destacados
-│   └── Nosotros.jsx           # Página dedicada Acerca de nosotros
+│   ├── AdminDashboardPage.jsx   # Panel administrativo (métricas, productos, mensajes)
+│   ├── Catalogo.jsx             # Catálogo híbrido conectado al BFF
+│   ├── Contacto.jsx             # Formulario conectado a POST /api/contact
+│   ├── Eventos.jsx              # Cotizador interactivo de mesas dulces
+│   ├── Inicio.jsx               # Portada y destacados sincronizados con el BFF
+│   ├── LoginPage.jsx            # Inicio de sesión conectado a POST /api/auth/login
+│   ├── Nosotros.jsx             # Historia del atelier
+│   └── RegisterPage.jsx         # Registro conectado a POST /api/auth/register
+├── services/
+│   ├── api.js                   # Instancia Axios + interceptores Bearer y 401
+│   ├── authService.js           # Login, registro y persistencia de sesión
+│   ├── bffService.js            # /bff/catalog-view y /bff/admin-dashboard
+│   ├── contactService.js        # Envío, listado, lectura y borrado de mensajes
+│   ├── index.js                 # Exportaciones centralizadas
+│   └── productService.js        # CRUD de /products
 ├── utils/
-│   └── formatters.js          # Formateo de moneda CLP y utilidades
-├── App.css                    # Sistema de diseño, paleta y estilos responsive
-├── App.jsx                    # Enrutamiento por hash y composición principal
-├── index.css                  # Tipografía, variables base y reset global
-├── main.jsx                   # Punto de entrada de React
-└── setupTests.js              # Configuración de Testing Library para Vitest
+│   ├── catalogMapper.js         # Fusión híbrida API backend + catálogo visual local
+│   └── formatters.js            # Formateo de moneda CLP
+├── App.css
+├── App.jsx                      # HashRouter y definición de rutas
+├── index.css
+├── main.jsx
+└── setupTests.js
 ```
-
-## Próximas mejoras recomendadas
-
-- Conectar los formularios de contacto y cotización de eventos a una API o servicio de mensajería transaccional.
-- Gestionar el catálogo, stock diario y pedidos desde un backend con pasarela de pagos.
-- Incorporar React Router si la aplicación requiere URLs limpias en servidor o rutas privadas.

@@ -5,7 +5,9 @@ import viennoiserieImg from '../assets/images/product_viennoiserie_1794710283251
 import tortaAurumImg from '../assets/images/product_torta_aurum_1794710285080.jpg'
 import nosotrosTallerImg from '../assets/images/nosotros_taller_equipo_1794714951519.jpg'
 import MediaImage from '../components/MediaImage'
-import { products } from '../data/products'
+import { products as staticProducts } from '../data/products'
+import { bffService } from '../services'
+import { mergeCatalogProducts } from '../utils/catalogMapper'
 
 const heroSlides = [
   {
@@ -32,11 +34,31 @@ const heroSlides = [
 
 export default function Inicio({ onNavigate }) {
   const [slide, setSlide] = useState(0)
-  const featuredProducts = products.filter((product) => product.featured).slice(0, 3)
+  const [catalogProducts, setCatalogProducts] = useState(staticProducts)
+  const featuredProducts = catalogProducts.filter((product) => product.featured).slice(0, 3)
 
   useEffect(() => {
     const timer = window.setInterval(() => setSlide((current) => (current + 1) % heroSlides.length), 5500)
     return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    bffService
+      .getCatalogView()
+      .then((res) => {
+        if (!active) return
+        const apiProducts = res?.data?.products
+        if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+          setCatalogProducts(mergeCatalogProducts(apiProducts))
+        }
+      })
+      .catch(() => {
+        // Mantiene destacados locales como respaldo
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   return (

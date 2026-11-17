@@ -27,15 +27,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status
+    const requestUrl = error?.config?.url || ''
+    const isAuthRequest = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register')
+    const hasToken = Boolean(localStorage.getItem('token'))
 
-    if (status === 401 || status === 403) {
+    if (!isAuthRequest && (status === 401 || (status === 403 && !hasToken))) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
 
-      const isLoginPage = window.location.pathname === '/login' || window.location.hash === '#/login'
-
+      const isLoginPage = window.location.hash === '#/login' || window.location.pathname === '/login'
       if (!isLoginPage) {
-        window.location.href = '/login'
+        window.location.hash = '#/login'
       }
     }
 

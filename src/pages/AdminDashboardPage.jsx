@@ -9,6 +9,7 @@ export default function AdminDashboardPage() {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [messageError, setMessageError] = useState('')
+  const [messageSuccess, setMessageSuccess] = useState('')
   const [productForm, setProductForm] = useState({
     name: '',
     description: '',
@@ -22,6 +23,13 @@ export default function AdminDashboardPage() {
     () => products.length || stats?.totalProducts || 0,
     [products, stats],
   )
+
+  const unreadCount = useMemo(() => {
+    if (messages.length > 0) {
+      return messages.filter((message) => message.status === 'UNREAD').length
+    }
+    return stats?.unreadMessagesCount ?? 0
+  }, [messages, stats])
 
   useEffect(() => {
     const loadAdminData = async () => {
@@ -53,19 +61,24 @@ export default function AdminDashboardPage() {
 
   const handleProductSubmit = async (event) => {
     event.preventDefault()
+    setMessageError('')
+    setMessageSuccess('')
 
     try {
       const payload = {
-        name: productForm.name,
-        description: productForm.description,
+        name: productForm.name.trim(),
+        description: productForm.description.trim(),
         price: Number(productForm.price),
         stock: Number(productForm.stock),
         category: productForm.category,
-        imageUrl: productForm.imageUrl,
+        imageUrl: productForm.imageUrl.trim(),
       }
 
       const { data } = await productService.create(payload)
       setProducts((current) => [data, ...current])
+      setStats((current) =>
+        current ? { ...current, totalProducts: (current.totalProducts ?? 0) + 1 } : current,
+      )
       setProductForm({
         name: '',
         description: '',
@@ -74,33 +87,52 @@ export default function AdminDashboardPage() {
         category: 'Tortas',
         imageUrl: '',
       })
+      setMessageSuccess('Producto guardado correctamente.')
     } catch (error) {
       console.error('Error creating product', error)
-      setMessageError('No se pudo crear el producto.')
+      setMessageError(error?.response?.data?.message || 'No se pudo crear el producto.')
     }
   }
 
   const handleDeleteProduct = async (id) => {
+    setMessageError('')
+    setMessageSuccess('')
     try {
       await productService.delete(id)
       setProducts((current) => current.filter((product) => product.id !== id))
+      setStats((current) =>
+        current ? { ...current, totalProducts: Math.max(0, (current.totalProducts ?? 1) - 1) } : current,
+      )
+      setMessageSuccess('Producto eliminado correctamente.')
     } catch (error) {
       console.error('Error deleting product', error)
-      setMessageError('No se pudo eliminar el producto.')
+      setMessageError(error?.response?.data?.message || 'No se pudo eliminar el producto.')
     }
   }
 
   const handleMarkAsRead = async (id) => {
+    setMessageError('')
     try {
-      await contactService.markAsRead(id)
+      const { data } = await contactService.markAsRead(id)
       setMessages((current) =>
         current.map((message) =>
-          message.id === id ? { ...message, read: true } : message,
+          message.id === id ? { ...message, status: data?.status || 'READ' } : message,
         ),
       )
     } catch (error) {
       console.error('Error updating message', error)
-      setMessageError('No se pudo actualizar el mensaje.')
+      setMessageError(error?.response?.data?.message || 'No se pudo actualizar el mensaje.')
+    }
+  }
+
+  const handleDeleteMessage = async (id) => {
+    setMessageError('')
+    try {
+      await contactService.delete(id)
+      setMessages((current) => current.filter((message) => message.id !== id))
+    } catch (error) {
+      console.error('Error deleting message', error)
+      setMessageError(error?.response?.data?.message || 'No se pudo eliminar el mensaje.')
     }
   }
 
@@ -114,7 +146,13 @@ export default function AdminDashboardPage() {
 
       {messageError && (
         <div className="container">
-          <p className="form-error">{messageError}</p>
+          <p className="form-error" role="alert">{messageError}</p>
+        </div>
+      )}
+
+      {messageSuccess && (
+        <div className="container">
+          <p className="form-success" role="status">{messageSuccess}</p>
         </div>
       )}
 
@@ -135,7 +173,7 @@ export default function AdminDashboardPage() {
             </article>
             <article className="auth-card" style={{ padding: '1.5rem' }}>
               <p className="eyebrow">Mensajes sin leer</p>
-              <h2>{stats?.unreadMessages ?? messages.filter((message) => !message.read).length}</h2>
+              <h2>{unreadCount}</h2>
             </article>
           </section>
 
@@ -154,11 +192,11 @@ export default function AdminDashboardPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <label>
                     <span>Precio</span>
-                    <input type="number" name="price" value={productForm.price} onChange={handleProductChange} required />
+                    <input type="number" min="0" name="price" value={productForm.price} onChange={handleProductChange} required />
                   </label>
                   <label>
                     <span>Stock</span>
-                    <input type="number" name="stock" value={productForm.stock} onChange={handleProductChange} required />
+                    <input type="number" min="0" name="stock" value={productForm.stock} onChange={handleProductChange} required />
                   </label>
                 </div>
                 <label>
@@ -190,7 +228,7 @@ export default function AdminDashboardPage() {
                     <div key={product.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '0.75rem', display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center' }}>
                       <div>
                         <strong>{product.name}</strong>
-                        <div className="small">{product.category}</div>
+                        <div className="small">{product.category} · ${Number(product.price).toLocaleString('es-CL')} · Stock: {product.stock}</div>
                       </div>
                       <button className="button button-primary" type="button" onClick={() => handleDeleteProduct(product.id)}>
                         Eliminar
@@ -209,22 +247,36 @@ export default function AdminDashboardPage() {
                 {messages.length === 0 ? (
                   <p>No tienes mensajes.</p>
                 ) : (
-                  messages.map((message) => (
-                    <div key={message.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '0.9rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                        <strong>{message.name}</strong>
-                        <span>{message.read ? 'Leído' : 'Nuevo'}</span>
+                  messages.map((message) => {
+                    const isUnread = message.status === 'UNREAD'
+                    const statusLabel = message.status === 'REPLIED'
+                      ? 'Respondido'
+                      : isUnread
+                        ? 'Nuevo'
+                        : 'Leído'
+
+                    return (
+                      <div key={message.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '0.9rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <strong>{message.name}</strong>
+                          <span>{statusLabel}</span>
+                        </div>
+                        <div>{message.email}{message.phone ? ` · ${message.phone}` : ''}</div>
+                        <div><strong>{message.subject}</strong></div>
+                        <p>{message.message}</p>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          {isUnread && (
+                            <button type="button" className="button button-primary" onClick={() => handleMarkAsRead(message.id)}>
+                              Marcar como leído
+                            </button>
+                          )}
+                          <button type="button" className="text-button" onClick={() => handleDeleteMessage(message.id)}>
+                            Eliminar
+                          </button>
+                        </div>
                       </div>
-                      <div>{message.email}</div>
-                      <div>{message.subject}</div>
-                      <p>{message.message}</p>
-                      {!message.read && (
-                        <button type="button" className="button button-primary" onClick={() => handleMarkAsRead(message.id)}>
-                          Marcar como leído
-                        </button>
-                      )}
-                    </div>
-                  ))
+                    )
+                  })
                 )}
               </div>
             </div>
